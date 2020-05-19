@@ -1,2 +1,7 @@
 AutoHub/.vs
+obj/
+AutoHub/bin
 *.cache
+*.dll
+*.exe
+*.pdb
