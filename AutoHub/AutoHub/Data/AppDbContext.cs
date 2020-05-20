@@ -12,11 +12,14 @@ namespace AutoHub.Data
         public DbSet<Car> Cars { get; set; }
         public DbSet<CarModel> CarModels { get; set; }
         public DbSet<Color> Colors { get; set; }
-        public DbSet<Brand> Brands { get; set; }
+        public virtual DbSet<Brand> Brands { get; set; }
 
         public AppDbContext(DbContextOptions<AppDbContext> options)
                 : base(options) { }
 
+        public AppDbContext() { }
+ 
+        
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);

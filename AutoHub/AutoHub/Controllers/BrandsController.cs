@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using AutoHub.Data;
 using AutoHub.Data.Entities;
+using AutoHub.ViewModels.Brand;
+using System.Runtime.InteropServices;
+using AutoHub.Interfaces;
 
 namespace AutoHub.Controllers
 {
@@ -15,50 +18,51 @@ namespace AutoHub.Controllers
     [ApiController]
     public class BrandsController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly IBrandRepository _repository;
 
-        public BrandsController(AppDbContext context)
+        public BrandsController(IBrandRepository repository)
         {
-            _context = context;
+            _repository = repository;
         }
 
         // GET: api/Brands
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Brand>>> GetBrands()
+        public  ActionResult<IEnumerable<BrandViewModel>> GetBrands()
         {
-            return await _context.Brands.ToListAsync();
+            var result = _repository.GetBrandList();
+
+            return result;
         }
 
-        // GET: api/Brands/5
+       // GET: api/Brands/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Brand>> GetBrand(int id)
+        public async Task<ActionResult<BrandViewModel>> GetBrand(int id)
         {
-            var brand = await _context.Brands.FindAsync(id);
+            var brand = await _repository.GetBrandAsync(id);
 
             if (brand == null)
             {
                 return NotFound();
             }
 
-            return brand;
+            var brandViewModel = new BrandViewModel
+            {
+                Name = brand.Name
+            };
+            return brandViewModel;
         }
 
-        // PUT: api/Brands/5
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        // PUT
         [HttpPut("{id}")]
         public async Task<IActionResult> PutBrand(int id, Brand brand)
         {
             if (id != brand.Id)
             {
                 return BadRequest();
-            }
-
-            _context.Entry(brand).State = EntityState.Modified;
-
+            }     
             try
             {
-                await _context.SaveChangesAsync();
+                await _repository.UpdateAsync(brand);
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -75,37 +79,30 @@ namespace AutoHub.Controllers
             return NoContent();
         }
 
-        // POST: api/Brands
-        // To protect from overposting attacks, enable the specific properties you want to bind to, for
-        // more details, see https://go.microsoft.com/fwlink/?linkid=2123754.
+        //POST: api/Brands
         [HttpPost]
         public async Task<ActionResult<Brand>> PostBrand(Brand brand)
         {
-            _context.Brands.Add(brand);
-            await _context.SaveChangesAsync();
-
+            await _repository.CreateAsync(brand);
             return CreatedAtAction("GetBrand", new { id = brand.Id }, brand);
         }
 
         // DELETE: api/Brands/5
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Brand>> DeleteBrand(int id)
+        public async Task<ActionResult<int>> DeleteBrand(int id)
         {
-            var brand = await _context.Brands.FindAsync(id);
-            if (brand == null)
+            if (id<0)
             {
                 return NotFound();
             }
+            await _repository.DeleteAsync(id);
 
-            _context.Brands.Remove(brand);
-            await _context.SaveChangesAsync();
-
-            return brand;
+            return id;
         }
 
         private bool BrandExists(int id)
         {
-            return _context.Brands.Any(e => e.Id == id);
+            return _repository.BrandExists(id);
         }
     }
 }
