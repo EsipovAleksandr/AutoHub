@@ -10,6 +10,7 @@ using AutoHub.Data.Entities;
 
 namespace AutoHub.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class BrandsController : ControllerBase

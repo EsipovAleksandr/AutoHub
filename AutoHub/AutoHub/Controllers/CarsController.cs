@@ -11,6 +11,7 @@ using AutoHub.ViewModels.Car;
 
 namespace AutoHub.Controllers
 {
+    [Produces("application/json")]
     [Route("api/[controller]")]
     [ApiController]
     public class CarsController : ControllerBase
